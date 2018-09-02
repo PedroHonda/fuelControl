@@ -1,4 +1,4 @@
 # fuelControl
-# Created by Pedro Honda
-# Initial commit - August 28th, 2018
+Created by Pedro Honda
+August 28th, 2018
 
