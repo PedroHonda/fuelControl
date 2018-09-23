@@ -79,7 +79,19 @@ Input:  tableName - table's name in which you want to insert the values
         self.cursor.execute(sqlINPUT, values)
         self.connection.commit()
 
-    def selectCommands(self, cmd, condition=False):
+    def getTables(self):
+        '''
+        Since sqlite3 does not support entries like ".dump" or ".tables", this function queries this database's schema to get table Names
+
+        '''
+        tables = []
+        schema = self.selectCommand("select sql from sqlite_master where type = 'table';")
+        for s in schema:
+            if "CREATE" in s[0]:
+                tables.append(s[0].split("TABLE")[1].split("(")[0].strip())
+        return tables
+
+    def selectCommand(self, cmd, condition=False):
         '''
 
     Example of SELECT command:
@@ -91,8 +103,8 @@ Input:  tableName - table's name in which you want to insert the values
         self.sqlCommand(cmd, condition)
         return self.cursor.fetchall()
 
-    def sqlCommand(self, cmd, condition=False):
-        if condition:
-            self.cursor.execute(cmd, condition)
+    def sqlCommand(self, cmd, args=False):
+        if args:
+            self.cursor.execute(cmd, args)
         else:
             self.cursor.execute(cmd)
