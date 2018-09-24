@@ -73,7 +73,7 @@ Input:  tableName - table's name in which you want to insert the values
         for column in columns:
             sqlINPUT += column + ", "
         sqlINPUT = sqlINPUT[:-2] + ") VALUES ("
-        for i in (0,len(values)):
+        for i in range(0,len(values)):
             sqlINPUT += "?,"
         sqlINPUT = sqlINPUT[:-1] + ")"
         self.cursor.execute(sqlINPUT, values)

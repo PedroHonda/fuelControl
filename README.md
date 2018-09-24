@@ -78,13 +78,13 @@ _**Response**_
 CREATE TABLE <carName> (
     date DATE,           
     mileage INTEGER,     
-    pricePerLitre REAL,  
-    litreTotal INTEGER,  
-    payTotal REAL,       
+    pricePerLitre FLOAT,  
+    litreTotal FLOAT,  
+    payTotal FLOAT,       
     fuelType VARCHAR(20),
     mileageDiff INTEGER, 
-    efficiency REAL,     
-    pricePerKm REAL,     
+    efficiency FLOAT,     
+    pricePerKm FLOAT,     
     comments)            
 ```
 
