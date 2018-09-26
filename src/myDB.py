@@ -53,12 +53,12 @@ Input: table - dictionary with table's name and its parameter as list of tuples 
             self.cursor.execute(sqlCREATE)
 
 
-    def insertValues(self, tableName, columns, values):
+    def insertValues(self, tableName, data):
         """
 Input:  tableName - table's name in which you want to insert the values
-        columns - tuple containing the column's names
-        values - tuple containing the values associated to each column
-            NOTE: column and values must have the same length
+        data - dictionary containing the columns as keys associated to each column
+            Example:
+            data = {"date":"2018-09-25","mileage":11000,"pricePerLitre":4.40}
 
     Example of ISERT command:
     INSERT INTO Car(date, mileage, pricePerLitre, litreTotal) VALUES ('2018/09/16', 100000, 4.39, 40);
@@ -67,13 +67,13 @@ Input:  tableName - table's name in which you want to insert the values
         cursor.execute(sql, ['2018/09/16', 100000, 4.39, 40])
         connection.commit()
         """
-        if len(columns) != len(values):
-            return 'Error!\n\tColumns and Values inputs should have the same number of elements'
+        values = []
         sqlINPUT = "INSERT INTO " + tableName + "("
-        for column in columns:
-            sqlINPUT += column + ", "
+        for d in data:
+            sqlINPUT += d + ", "
+            values.append(data[d])
         sqlINPUT = sqlINPUT[:-2] + ") VALUES ("
-        for i in range(0,len(values)):
+        for i in range(0,len(data)):
             sqlINPUT += "?,"
         sqlINPUT = sqlINPUT[:-1] + ")"
         self.cursor.execute(sqlINPUT, values)
@@ -102,6 +102,10 @@ Input:  tableName - table's name in which you want to insert the values
         '''
         self.sqlCommand(cmd, condition)
         return self.cursor.fetchall()
+    
+    def deleteTable(self, tableName):
+        sqlDROP = "DROP TABLE " + tableName
+        self.cursor.execute(sqlDROP)
 
     def sqlCommand(self, cmd, args=False):
         if args:

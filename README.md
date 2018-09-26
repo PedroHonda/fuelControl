@@ -73,6 +73,18 @@ _**Response**_
 - `200 OK`
   - If the request was a success
 
+### Deleting Car from database
+
+- Method : `DELETE /<carName>`
+- Should connect to `fuelControl.db` database and delete the `<carName>` table
+
+_**Response**_
+
+- `404 Not Found`
+  - Means that there is no `<carName>` table to be deleted
+- `200 OK`
+  - If the request was a success
+
 ## Database Schema
 ```
 CREATE TABLE <carName> (

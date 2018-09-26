@@ -1,6 +1,9 @@
 # Folder to not commit
 src/__pycache__
 
+# Files to not commit
+databases/fuelControl.db
+
 # File types to not commit
 *.pyc
 *.o

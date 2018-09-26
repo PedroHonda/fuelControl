@@ -37,8 +37,6 @@ class Car(Resource):
             args['fuelType'] = ''
         if not args['comments']:
             args['comments'] = ''
-        column = []
-        value = []
         db = myDB('./databases/fuelControl.db')
         tables = db.getTables()
         # make comparison case-insensitive
@@ -59,10 +57,7 @@ class Car(Resource):
             args['mileageDiff'] = 0
             args['efficiency'] = 0
             args['pricePerKm'] = 0
-            for key in args.keys():
-                column.append(key)
-                value.append(args[key])
-            db.insertValues(carName, column, value)
+            db.insertValues(carName, args)
             db.connection.close()
             return {'Created' : carName}, 201
         else:
@@ -70,12 +65,19 @@ class Car(Resource):
             args['mileageDiff'] = args['mileage'] - contentPast[-1][1]
             args['efficiency'] = float(args['litreTotal']) / float(args['mileageDiff'])
             args['pricePerKm'] = float(args['payTotal']) / float(args['mileageDiff'])
-            for key in args.keys():
-                column.append(key)
-                value.append(args[key])
-            db.insertValues(carName, column, value)
+            db.insertValues(carName, args)
             db.connection.close()
             return {'Success!' : carName}, 200
+    
+    def delete(self, carName):
+        db = myDB('./databases/fuelControl.db')
+        try:
+            db.deleteTable(carName)
+            db.connection.close()
+            return {'Table dropped' : carName}, 200
+        except:
+            db.connection.close()
+            return {'No table found' : carName}, 404
 
 api.add_resource(Home, '/')
 api.add_resource(Car, '/<string:carName>')
