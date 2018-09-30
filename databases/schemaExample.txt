@@ -1,0 +1,12 @@
+CREATE TABLE car003 (
+    date DATE,
+    mileage INTEGER,
+    pricePerLitre FLOAT,
+    litreTotal FLOAT,
+    payTotal FLOAT,
+    fuelType VARCHAR(20),
+    mileageDiff INTEGER,
+    efficiency FLOAT,
+    pricePerKm FLOAT,
+    comments
+)
