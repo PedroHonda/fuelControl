@@ -1,20 +1,22 @@
+import os
 from myDB import myDB
 from flask import Flask, request, g
 from flask_restful import Resource, Api, reqparse
-
 app = Flask(__name__)
 api = Api(app)
 
+fuelControlDB = os.path.realpath(__file__).split('database_management')[0]+'databases/fuelControl.db'
+
 class Home(Resource):
     def get(self):
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         tables = db.getTables()
         db.connection.close()
         return tables, 200
 
 class Car(Resource):
     def get(self, carName):
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         tables = db.getTables()
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
@@ -37,7 +39,7 @@ class Car(Resource):
             args['fuelType'] = ''
         if not args['comments']:
             args['comments'] = ''
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         tables = db.getTables()
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
@@ -60,7 +62,7 @@ class Car(Resource):
             return {'Success!' : carName}, 200
     
     def delete(self, carName):
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         try:
             db.deleteTable(carName)
             db.connection.close()
@@ -86,7 +88,7 @@ class Car(Resource):
         rowId = args['rowId']
         del args['rowId']
         args = {key:value for key,value in args.items() if args[key]}
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         #updateValues = request.json
         #rowId = updateValues["rowId"]
         db.updateValueRowId(carName, args, rowId)
@@ -95,7 +97,7 @@ class Car(Resource):
 
 class CarHelp(Resource):
     def get(self, carName):
-        db = myDB('./databases/fuelControl.db')
+        db = myDB(fuelControlDB)
         tables = db.getTables()
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
