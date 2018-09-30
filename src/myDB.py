@@ -69,9 +69,9 @@ Input:  tableName - table's name in which you want to insert the values
         """
         values = []
         sqlINPUT = "INSERT INTO " + tableName + "("
-        for d in data:
-            sqlINPUT += d + ", "
-            values.append(data[d])
+        for key in data:
+            sqlINPUT += key + ", "
+            values.append(data[key])
         sqlINPUT = sqlINPUT[:-2] + ") VALUES ("
         for i in range(0,len(data)):
             sqlINPUT += "?,"
@@ -87,9 +87,21 @@ Input:  tableName - table's name in which you want to insert the values
         tables = []
         schema = self.selectCommand("select sql from sqlite_master where type = 'table';")
         for s in schema:
-            if "CREATE" in s[0]:
-                tables.append(s[0].split("TABLE")[1].split("(")[0].strip())
+            if "create" in s[0].lower():
+                tables.append(s[0].lower().split("table")[1].split("(")[0].strip())
         return tables
+
+    def getTablesParameters(self, tableName):
+        '''
+        '''
+        parameters = []
+        schema = self.selectCommand("select sql from sqlite_master where type = 'table';")
+        for s in schema:
+            if tableName.lower() in s[0].lower():
+                allPar = s[0].split("(",1)[1].rsplit(")",1)[0]
+                for par in allPar.split(","):
+                    parameters.append(par.strip().split(" ",1)[0])
+                return parameters
 
     def selectCommand(self, cmd, condition=False):
         '''
@@ -106,6 +118,25 @@ Input:  tableName - table's name in which you want to insert the values
     def deleteTable(self, tableName):
         sqlDROP = "DROP TABLE " + tableName
         self.cursor.execute(sqlDROP)
+
+    def updateValueRowId(self, tableName, data, rowId):
+        """
+Input:  tableName - table's name in which you want to update the values
+        data - dictionary containing column's name as keys
+        condition - string to know which information to update (THIS IS NOT OPTIONAL, TO PROTECT THE DATABASE)
+
+        Example of UPDATE command:
+            UPDATE car SET date = '2018-09-01', mileage = 10000 WHERE rowId = 10;
+        """
+        values = []
+        sqlUPDATE = "UPDATE " + tableName + " SET "
+        for key in data:
+            sqlUPDATE += key + " = ? , "
+            values.append(data[key])
+        sqlUPDATE = sqlUPDATE[:-2] + " WHERE rowId = ? ;"
+        values.append(rowId)
+        self.cursor.execute(sqlUPDATE, values)
+        self.connection.commit()
 
     def sqlCommand(self, cmd, args=False):
         if args:

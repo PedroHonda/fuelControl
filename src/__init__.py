@@ -19,7 +19,7 @@ class Car(Resource):
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
             return {'Not found' : carName}, 404
-        content = db.selectCommand('SELECT * FROM ' + carName)
+        content = db.selectCommand('SELECT rowId,* FROM ' + carName)
         db.connection.close()
         return content, 200
 
@@ -41,23 +41,13 @@ class Car(Resource):
         tables = db.getTables()
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
-            newCar = {}
-            newCar[carName] = []
-            newCar[carName].append({'Name' : 'date', 'Type' : 'DATE'})
-            newCar[carName].append({'Name' : 'mileage', 'Type' : 'INTEGER'})
-            newCar[carName].append({'Name' : 'pricePerLitre', 'Type' : 'FLOAT'})
-            newCar[carName].append({'Name' : 'litreTotal', 'Type' : 'FLOAT'})
-            newCar[carName].append({'Name' : 'payTotal', 'Type' : 'FLOAT'})
-            newCar[carName].append({'Name' : 'fuelType', 'Type' : 'VARCHAR(20)'})
-            newCar[carName].append({'Name' : 'mileageDiff', 'Type' : 'INTEGER'})
-            newCar[carName].append({'Name' : 'efficiency', 'Type' : 'FLOAT'})
-            newCar[carName].append({'Name' : 'pricePerKm', 'Type' : 'FLOAT'})
-            newCar[carName].append({'Name' : 'comments', 'Type' : ''})
-            db.createTable(newCar)
+            newCarSQL = "CREATE TABLE " + carName + " (date DATE,mileage INTEGER,pricePerLitre FLOAT,litreTotal FLOAT,payTotal FLOAT,fuelType VARCHAR(20),mileageDiff INTEGER,efficiency FLOAT,pricePerKm FLOAT,comments)"
+            db.sqlCommand(newCarSQL)
             args['mileageDiff'] = 0
             args['efficiency'] = 0
             args['pricePerKm'] = 0
             db.insertValues(carName, args)
+
             db.connection.close()
             return {'Created' : carName}, 201
         else:
@@ -78,6 +68,42 @@ class Car(Resource):
         except:
             db.connection.close()
             return {'No table found' : carName}, 404
+    
+    def put(self, carName):
+        parser = reqparse.RequestParser()
+        parser.add_argument('date', help='Date must be a String')
+        parser.add_argument('mileage', type=int, help='Mileage must be a Integer')
+        parser.add_argument('pricePerLitre', type=float, help='Price per Litre must be a Float')
+        parser.add_argument('litreTotal', type=float, help='Total litre must be a Float')
+        parser.add_argument('payTotal', type=float, help='Pay Total must be a Float')
+        parser.add_argument('fuelType', type=str, help='Fuel Type must be a String')
+        parser.add_argument('comments', type=str, help='Comments must be a String')
+        parser.add_argument('mileageDiff', type=int, help='MileageDIFF must be a Integer')
+        parser.add_argument('efficiency', type=float, help='Efficiency must be a Float')
+        parser.add_argument('pricePerKm', type=float, help='Price per Km must be a Float')
+        parser.add_argument('rowId', required=True, type=int, help='Row ID must be a Integer')
+        args = parser.parse_args()
+        rowId = args['rowId']
+        del args['rowId']
+        args = {key:value for key,value in args.items() if args[key]}
+        db = myDB('./databases/fuelControl.db')
+        #updateValues = request.json
+        #rowId = updateValues["rowId"]
+        db.updateValueRowId(carName, args, rowId)
+        db.connection.close()
+        return args, 200
+
+class CarHelp(Resource):
+    def get(self, carName):
+        db = myDB('./databases/fuelControl.db')
+        tables = db.getTables()
+        # make comparison case-insensitive
+        if carName.lower() not in map(lambda x:x.lower(),tables):
+            return {'Not found' : carName}, 404
+        content = db.getTablesParameters(carName)
+        db.connection.close()
+        return content, 200
 
 api.add_resource(Home, '/')
 api.add_resource(Car, '/<string:carName>')
+api.add_resource(CarHelp, '/<string:carName>/parameters')
