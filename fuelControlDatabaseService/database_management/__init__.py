@@ -2,8 +2,11 @@ import os
 from myDB import myDB
 from flask import Flask, request, g
 from flask_restful import Resource, Api, reqparse
+from flask_cors import CORS
+
 app = Flask(__name__)
 api = Api(app)
+CORS(app)
 
 fuelControlDB = os.path.realpath(__file__).split('database_management')[0]+'databases/fuelControl.db'
 
@@ -55,8 +58,13 @@ class Car(Resource):
         else:
             contentPast = db.selectCommand('SELECT * FROM ' + carName)
             args['mileageDiff'] = args['mileage'] - contentPast[-1][1]
-            args['efficiency'] = float(args['litreTotal']) / float(args['mileageDiff'])
-            args['pricePerKm'] = float(args['payTotal']) / float(args['mileageDiff'])
+            if float(args['mileageDiff']):
+                if float(args['mileageDiff']) < 0:
+                    return {'Failure!' : 'Mileage Diff is negative!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
+                args['efficiency'] = float(args['litreTotal']) / float(args['mileageDiff'])
+                args['pricePerKm'] = float(args['payTotal']) / float(args['mileageDiff'])
+            else:
+                return {'Failure!' : 'Mileage Diff is zero!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
             db.insertValues(carName, args)
             db.connection.close()
             return {'Success!' : carName}, 200

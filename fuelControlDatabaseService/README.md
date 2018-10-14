@@ -66,6 +66,8 @@ _**Response**_
 
 _**Response**_
 
+- `500 Internal Server Error`
+  - If the input data results in some calculation error. Most likely the mileage parameter passed is equal or less than the previous one in database.
 - `400 Bad Request`
   - If the data type for some of the input values is wrong
 - `201 Created`
