@@ -22,16 +22,43 @@ h4 {
     font-size:              20pt;
 }
 </style>
+<script>
+function httpGET(url, callback) {
+    const http = new XMLHttpRequest();
+    http.open("GET", url, true);
+    http.onreadystatechange=(e)=>{
+        if (http.readyState == 4 && http.status == 200)
+            callback(http.responseText);
+    }
+    http.send();
+}
+
+function tablesAvailable(json) {
+    var obj = JSON.parse(json);
+    var li, a, i;
+    for (i = 0; i < obj.length; i++) {
+        li = document.createElement("li");
+        a = document.createElement("a");
+        a.textContent = obj[i];
+        a.setAttribute("href", obj[i] + ".html");
+        li.appendChild(a);
+        document.getElementById("tables").appendChild(li);
+    }
+}
+
+httpGET("http://127.0.0.1:8080", tablesAvailable);
+</script>
 <body>
     <h3>fuelControl</h3>
     <hr>
     <h4>Tables available:</h4>
+    <ul id="tables"></ul>
+    <h4>Other templates:</h4>
     <ul>
         <li><a href="hondaCivic.html">Honda Civic</a></li> 
         <li><a href="http.html">HTTP</a></li>
         <li>Honda CR-V</li>
     </ul>
-    
     <p>Created by Pedro Honda in September 2018</p>
 </body>
 </html>
