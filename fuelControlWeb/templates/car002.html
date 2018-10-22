@@ -50,6 +50,21 @@ input:hover {
     background-color:     aliceblue;
 }
 
+.inputOptional {
+    background-color:       rgb(255, 252, 214);
+}
+
+button {
+    background-color:       #4CAF50; /* Green */
+    border:                 none;
+    color:                  white;
+    padding:                15px 32px;
+    text-align:             center;
+    text-decoration:        none;
+    display:                inline-block;
+    font-size:              16px;
+}
+
 </style>
 <script>
 function httpGET(url, callback) {
@@ -60,6 +75,13 @@ function httpGET(url, callback) {
             callback(http.responseText);
     }
     http.send();
+}
+
+function httpPOST(url, json) {
+    const http = new XMLHttpRequest();
+    http.open("POST", url, true);
+    http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    http.send(JSON.stringify(json));
 }
 
 function fillTable(json) {
@@ -83,6 +105,14 @@ function fillTable(json) {
     }
 }
 
+function postValues() {
+    var inputDate = document.getElementById("inputDate").value;
+    var inputMileage = document.getElementById("inputMileage").value;
+    var inputPricePerLitre = document.getElementById("inputPricePerLitre").value;
+    var inputTotalPrice = document.getElementById("inputTotalPrice").value;
+    console.log(inputDate);
+}
+
 function testing(json) {
     document.getElementById("testing").innerHTML = json;
 }
@@ -92,6 +122,21 @@ httpGET("http://127.0.0.1:8080/car002", fillTable);
 <body>
     <h3>car002</h3>
     <hr>
+    <br>
+    <button onclick="postValues()">POST button</button>
+    <table id="inputTable">
+        <tr>
+            <th colspan="6">POST values</th>
+        </tr>
+        <tr>
+            <td><input type="text" placeholder="Date" id="inputDate"></td>
+            <td><input type="number" placeholder="Mileage" id="inputMileage"></td>
+            <td><input type="number" placeholder="Price per Litre" id="inputPricePerLitre"></td>
+            <td><input type="number" placeholder="Total Price paid" id="inputTotalPrice"></td>
+            <td><input type="text" placeholder="Fuel Type" id="inputFuelType" class="inputOptional"></td>
+            <td><input type="text" placeholder="Comments" id="inputComments" class="inputOptional"></td>
+        </tr>
+    </table>
     <br>
     <table id="tablesContent">
         <tr>

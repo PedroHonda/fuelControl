@@ -28,8 +28,9 @@ p:hover {
     <h3>HTTP Requests</h3>
     <hr>
     <br>
-    <button onclick="httpGET('http://localhost:8080/',inputToParagraph)">GETting car002</button>
+    <button onclick="httpGET('http://localhost:8080/car002',inputToParagraph)">GETting car002</button>
     <p id="Paragraph"></p>
+    <button onclick="httpPOST('http://localhost:8080/car002', {'date' : '2018-10-20', 'mileage' : 13500, 'pricePerLitre' : 4.000, 'litreTotal' : 20.0 })">POSTing car002</button>
     <br>
     <a href="index.html">Back</a>
 </body>

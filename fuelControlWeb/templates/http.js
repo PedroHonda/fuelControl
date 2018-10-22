@@ -8,6 +8,13 @@ function httpGET(url, callback) {
     http.send();
 }
 
+function httpPOST(url, json) {
+    const http = new XMLHttpRequest();
+    http.open("POST", url, true);
+    http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    http.send(JSON.stringify(json));
+}
+
 function inputToParagraph(msg) {
     document.getElementById("Paragraph").innerHTML = msg;
 }
