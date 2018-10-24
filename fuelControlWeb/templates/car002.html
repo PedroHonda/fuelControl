@@ -10,6 +10,11 @@
 * {
     font-family:            'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
     font-size:              100%;
+    -webkit-transition: all 1s ease-in-out;
+    -moz-transition: all 1s ease-in-out;
+    -o-transition: all 1s ease-in-out;
+    -ms-transition: all 1s ease-in-out;
+    transition: all 1s ease-in-out;
 }
 h3 {
     font-style:             italic;
@@ -58,11 +63,15 @@ button {
     background-color:       #4CAF50; /* Green */
     border:                 none;
     color:                  white;
-    padding:                15px 32px;
+    padding:                6px 32px;
     text-align:             center;
     text-decoration:        none;
     display:                inline-block;
     font-size:              16px;
+}
+
+.buttonPOST {
+    width:                  100px;
 }
 
 </style>
@@ -77,13 +86,18 @@ function httpGET(url, callback) {
     http.send();
 }
 
-function httpPOST(url, json) {
+function httpPOST(url, callback, json) {
     const http = new XMLHttpRequest();
     http.open("POST", url, true);
     http.setRequestHeader("Content-Type", "application/json;charset=UTF-8");
+    http.onreadystatechange=(e)=>{
+        if (http.readyState == 4)
+            callback(http.responseText, http.status);
+    }
     http.send(JSON.stringify(json));
 }
 
+// Callback function for filling the table
 function fillTable(json) {
     var obj = JSON.parse(json);
     var tr, td, inp, i, j;
@@ -105,12 +119,63 @@ function fillTable(json) {
     }
 }
 
+function callbackPOST (response, status) {
+    var postButtonVar = document.getElementById("postButton");
+    if (status == 200) {
+        document.getElementById("inputDate").value = "";
+        document.getElementById("inputMileage").value = "";
+        document.getElementById("inputPricePerLitre").value = "";
+        document.getElementById("inputTotalPrice").value = "";
+        document.getElementById("inputFuelType").value = "";
+        document.getElementById("inputComments").value = "";
+        
+        postButtonVar.style.background = '#FFF';
+        postButtonVar.style.color = '#4CAF50';
+        postButtonVar.textContent = 'OK!';
+        postButtonVar.disabled = true;
+        setTimeout(function(){
+            postButtonVar.style.background = '#4CAF50';
+            postButtonVar.style.color = '#FFF';
+            postButtonVar.textContent = 'POST';
+            postButtonVar.disabled = false;
+        },2000);
+        httpGET("http://127.0.0.1:8080/car002", fillTable);
+    } else if (status == 500) {
+        postButtonVar.style.background = '#FFF';
+        postButtonVar.style.color = '#FF0000';
+        postButtonVar.textContent = 'FAIL!';
+        postButtonVar.disabled = true;
+        setTimeout(function(){
+            postButtonVar.style.background = '#4CAF50';
+            postButtonVar.style.color = '#FFF';
+            postButtonVar.textContent = 'POST';
+            postButtonVar.disabled = false;
+            alert("Mileage value must be higher than the last value available on table");
+        },2000);
+        
+
+    }
+}
+
 function postValues() {
-    var inputDate = document.getElementById("inputDate").value;
-    var inputMileage = document.getElementById("inputMileage").value;
-    var inputPricePerLitre = document.getElementById("inputPricePerLitre").value;
-    var inputTotalPrice = document.getElementById("inputTotalPrice").value;
-    console.log(inputDate);
+    var inputDateVar = document.getElementById("inputDate").value;
+    var inputMileageVar = document.getElementById("inputMileage").value;
+    var inputPricePerLitreVar = document.getElementById("inputPricePerLitre").value;
+    var inputTotalPriceVar = document.getElementById("inputTotalPrice").value;
+    var inputFuelTypeVar = document.getElementById("inputFuelType").value;
+    var inputCommentsVar = document.getElementById("inputComments").value;
+    if (inputDateVar=="" || inputMileageVar=="" || inputPricePerLitreVar=="" || inputTotalPriceVar=="") {
+        alert("You must fill all required fields:\n\tDate\n\tMileage\n\tPrice per Litre\n\tTotal Price paid");
+        return;
+    }
+    var json = {};
+    json["date"] = inputDateVar;
+    json["mileage"] = Number(inputMileageVar);
+    json["pricePerLitre"] = Number(inputPricePerLitreVar);
+    json["litreTotal"] = Number(inputTotalPriceVar);
+    json["fuelType"] = inputFuelTypeVar;
+    json["comments"] = inputCommentsVar;
+    httpPOST("http://127.0.0.1:8080/car002", callbackPOST, json);
 }
 
 function testing(json) {
@@ -123,10 +188,10 @@ httpGET("http://127.0.0.1:8080/car002", fillTable);
     <h3>car002</h3>
     <hr>
     <br>
-    <button onclick="postValues()">POST button</button>
+    
     <table id="inputTable">
         <tr>
-            <th colspan="6">POST values</th>
+            <th colspan="7">POST values</th>
         </tr>
         <tr>
             <td><input type="text" placeholder="Date" id="inputDate"></td>
@@ -135,8 +200,11 @@ httpGET("http://127.0.0.1:8080/car002", fillTable);
             <td><input type="number" placeholder="Total Price paid" id="inputTotalPrice"></td>
             <td><input type="text" placeholder="Fuel Type" id="inputFuelType" class="inputOptional"></td>
             <td><input type="text" placeholder="Comments" id="inputComments" class="inputOptional"></td>
+            <td><button onclick="postValues()" id="postButton" class="buttonPOST">POST</button></td>
+            
         </tr>
-    </table>
+    </table> 
+    
     <br>
     <table id="tablesContent">
         <tr>
