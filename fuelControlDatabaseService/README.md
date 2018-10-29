@@ -17,7 +17,7 @@ August 28th, 2018
 _**Response**_
 
 - `404 Not Found`
-  - If there is no <carName> table in current database
+  - If there is no `<carName>` table in current database
 - `200 OK`
   - If the request was a success
   - Should also return the information in a JSON format
@@ -113,6 +113,36 @@ _**Response**_
   "comments"
 ]
 ```
+
+### Changing Table's Content
+
+- Method : `PUT /<carName>/`
+- Should connect to `fuelControl.db` and `<carName>` and change the table's content according to the input
+- The format of the data to be provided in this method is a JSON
+    - The only mandatory field to be provided is "rowId
+
+```json
+{
+    "rowId" : 5,
+    "date" : "2018-09-23",
+    "mileage" : 10500,
+    "pricePerLitre" : 4.000,
+    "litreTotal" : 25.0,
+    "payTotal" : 100.00,
+    "fuelType" : "Gasolina Comum",
+    "mileageDiff" : 500,
+    "efficiency" : 20.00,
+    "pricePerKm" : 0.20,
+    "comments" : "insert comment"
+}
+```
+
+_**Response**_
+
+- `400 Bad Request`
+  - If the data type for some of the input values is wrong
+- `200 OK`
+  - If the request was a success
 
 ## Database Schema
 ```

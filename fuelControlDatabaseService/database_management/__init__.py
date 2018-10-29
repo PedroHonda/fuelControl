@@ -30,7 +30,7 @@ class Car(Resource):
 
     def post(self, carName):
         parser = reqparse.RequestParser()
-        parser.add_argument('date', required=True, help='Date must be a String')
+        parser.add_argument('date', type=str, required=True, help='Date must be a String')
         parser.add_argument('mileage', type=int, required=True, help='Mileage must be a Integer')
         parser.add_argument('pricePerLitre', type=float, required=True, help='Price per Litre must be a Float')
         parser.add_argument('litreTotal', type=float, required=True, help='Total litre must be a Float')
@@ -81,7 +81,7 @@ class Car(Resource):
     
     def put(self, carName):
         parser = reqparse.RequestParser()
-        parser.add_argument('date', help='Date must be a String')
+        parser.add_argument('date', type=str, help='Date must be a String')
         parser.add_argument('mileage', type=int, help='Mileage must be a Integer')
         parser.add_argument('pricePerLitre', type=float, help='Price per Litre must be a Float')
         parser.add_argument('litreTotal', type=float, help='Total litre must be a Float')
@@ -95,12 +95,14 @@ class Car(Resource):
         args = parser.parse_args()
         rowId = args['rowId']
         del args['rowId']
+        # Deleting arguments which were not changed
         args = {key:value for key,value in args.items() if args[key]}
         db = myDB(fuelControlDB)
         #updateValues = request.json
         #rowId = updateValues["rowId"]
         db.updateValueRowId(carName, args, rowId)
         db.connection.close()
+        args['rowId'] = rowId
         return args, 200
 
 class CarHelp(Resource):
