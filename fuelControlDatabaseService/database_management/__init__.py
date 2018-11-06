@@ -17,6 +17,23 @@ class Home(Resource):
         db.connection.close()
         return tables, 200
 
+    def post(self):
+        args = request.json
+        if not isinstance(args, list):
+            return "Input is not a list!", 406
+        if len(args) > 1:
+            return "Array must have only 1 element!", 400
+        db = myDB(fuelControlDB)
+        tables = db.getTables()
+        carName = args[0]
+        if carName.lower() not in map(lambda x:x.lower(),tables):
+            newCarSQL = "CREATE TABLE " + carName + " (date DATE,mileage INTEGER,pricePerLitre FLOAT,litreTotal FLOAT,payTotal FLOAT,fuelType VARCHAR(20),mileageDiff INTEGER,efficiency FLOAT,pricePerKm FLOAT,comments)"
+            db.sqlCommand(newCarSQL)
+            db.connection.close()
+            return 'Created!', 201
+        db.connection.close()
+        return tables, 409
+
 class Car(Resource):
     def get(self, carName):
         db = myDB(fuelControlDB)
@@ -36,7 +53,17 @@ class Car(Resource):
         parser.add_argument('litreTotal', type=float, required=True, help='Total litre must be a Float')
         parser.add_argument('fuelType', type=str, help='Fuel Type must be a String')
         parser.add_argument('comments', type=str, help='Comments must be a String')
-        args = parser.parse_args()      
+        try:
+            args = parser.parse_args()      
+        except:
+            return {"Bad Input! Follow the example..." : {
+                    "date" : "2018-09-20",
+                    "mileage" : 10000,
+                    "pricePerLitre" : 4.000,
+                    "litreTotal" : 20.0,
+                    "fuelType" : "Gasolina Comum",
+                    "comments" : "insert comment"
+                }}, 400
         args['payTotal'] = args['pricePerLitre']*args['litreTotal']
         if not args['fuelType']:
             args['fuelType'] = ''
@@ -46,15 +73,7 @@ class Car(Resource):
         tables = db.getTables()
         # make comparison case-insensitive
         if carName.lower() not in map(lambda x:x.lower(),tables):
-            newCarSQL = "CREATE TABLE " + carName + " (date DATE,mileage INTEGER,pricePerLitre FLOAT,litreTotal FLOAT,payTotal FLOAT,fuelType VARCHAR(20),mileageDiff INTEGER,efficiency FLOAT,pricePerKm FLOAT,comments)"
-            db.sqlCommand(newCarSQL)
-            args['mileageDiff'] = 0
-            args['efficiency'] = 0
-            args['pricePerKm'] = 0
-            db.insertValues(carName, args)
-
-            db.connection.close()
-            return {'Created' : carName}, 201
+            return {'No Found' : carName}, 404
         else:
             contentPast = db.selectCommand('SELECT * FROM ' + carName)
             args['mileageDiff'] = args['mileage'] - contentPast[-1][1]

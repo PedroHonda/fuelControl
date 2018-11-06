@@ -4,10 +4,55 @@ August 28th, 2018
 
 ## HTTP Request / Response
 
-### Home Page
+### Retrieving All Tables Available
 
 - Method : `GET /`
-- Home Page needs to provide relevant information to access/input data from/into Car databases
+- Should connect to database `fuelControl.db` and show all tables available
+
+_**Response**_
+
+- `200 OK`
+  - This is the only response possible, since there is no additional parameters to be provided
+  - This shall return a list with all Tables available in current database
+```json
+[
+    "car002",
+    "car004",
+    "car003"
+]
+```
+
+### Creating a new Table
+
+- Method : `POST /`
+- Should connect to database `fuelControl.db` and create a table with all parameters needed
+- See _Database Schema_ at the end of this document to check out the parameters
+- Input should be an array of only one element, being it the table's names the user wants to create
+```json
+[
+    "car002"
+]
+```
+
+_**Response**_
+
+- `201 Created`
+  - If the table's creation was a success
+- `400 Bad Request`
+  - When the input has more than one element
+- `406 Not Acceptable`
+  - When user's input is not a list
+- `409 Conflict`
+  - When there is already a table for the given input
+  - Also returns all tables available
+```json
+[
+    "car002",
+    "car004",
+    "car003"
+]
+```
+
 
 ### Accessing Database Information
 
@@ -60,7 +105,9 @@ _**Response**_
     "date" : "2018-09-20",
     "mileage" : 10000,
     "pricePerLitre" : 4.000,
-    "litreTotal" : 20.0
+    "litreTotal" : 20.0,
+    "fuelType" : "Gasolina Comum",
+    "comments" : "insert comment"
 }
 ```
 
@@ -68,10 +115,41 @@ _**Response**_
 
 - `500 Internal Server Error`
   - If the input data results in some calculation error. Most likely the mileage parameter passed is equal or less than the previous one in database.
+- `404 Not Found`
+  - If there is no `<carName>` table in current database
 - `400 Bad Request`
   - If the data type for some of the input values is wrong
-- `201 Created`
-  - If the table for `<carName>` was not yet created
+  - Or if data type is not a dictionary
+  - Should return a json with an example of input
+- `200 OK`
+  - If the request was a success
+
+### Changing Table's Content
+
+- Method : `PUT /<carName>/`
+- Should connect to `fuelControl.db` and `<carName>` and change the table's content according to the input
+- The format of the data to be provided in this method is a JSON
+    - The only mandatory field to be provided is "rowId
+```json
+{
+    "rowId" : 5,
+    "date" : "2018-09-23",
+    "mileage" : 10500,
+    "pricePerLitre" : 4.000,
+    "litreTotal" : 25.0,
+    "payTotal" : 100.00,
+    "fuelType" : "Gasolina Comum",
+    "mileageDiff" : 500,
+    "efficiency" : 20.00,
+    "pricePerKm" : 0.20,
+    "comments" : "insert comment"
+}
+```
+
+_**Response**_
+
+- `400 Bad Request`
+  - If the data type for some of the input values is wrong
 - `200 OK`
   - If the request was a success
 
@@ -113,36 +191,6 @@ _**Response**_
   "comments"
 ]
 ```
-
-### Changing Table's Content
-
-- Method : `PUT /<carName>/`
-- Should connect to `fuelControl.db` and `<carName>` and change the table's content according to the input
-- The format of the data to be provided in this method is a JSON
-    - The only mandatory field to be provided is "rowId
-
-```json
-{
-    "rowId" : 5,
-    "date" : "2018-09-23",
-    "mileage" : 10500,
-    "pricePerLitre" : 4.000,
-    "litreTotal" : 25.0,
-    "payTotal" : 100.00,
-    "fuelType" : "Gasolina Comum",
-    "mileageDiff" : 500,
-    "efficiency" : 20.00,
-    "pricePerKm" : 0.20,
-    "comments" : "insert comment"
-}
-```
-
-_**Response**_
-
-- `400 Bad Request`
-  - If the data type for some of the input values is wrong
-- `200 OK`
-  - If the request was a success
 
 ## Database Schema
 ```
