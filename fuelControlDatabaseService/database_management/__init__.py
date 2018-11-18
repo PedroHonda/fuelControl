@@ -30,7 +30,7 @@ class Home(Resource):
             newCarSQL = "CREATE TABLE " + carName + " (date DATE,mileage INTEGER,pricePerLitre FLOAT,litreTotal FLOAT,payTotal FLOAT,fuelType VARCHAR(20),mileageDiff INTEGER,efficiency FLOAT,pricePerKm FLOAT,comments)"
             db.sqlCommand(newCarSQL)
             db.connection.close()
-            return 'Created!', 201
+            return carName, 201
         db.connection.close()
         return tables, 409
 
@@ -93,7 +93,7 @@ class Car(Resource):
         try:
             db.deleteTable(carName)
             db.connection.close()
-            return {'Table dropped' : carName}, 200
+            return {'Name' : carName}, 200
         except:
             db.connection.close()
             return {'No table found' : carName}, 404
