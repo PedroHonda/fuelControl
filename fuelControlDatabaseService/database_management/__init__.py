@@ -76,14 +76,21 @@ class Car(Resource):
             return {'No Found' : carName}, 404
         else:
             contentPast = db.selectCommand('SELECT * FROM ' + carName)
-            args['mileageDiff'] = args['mileage'] - contentPast[-1][1]
-            if float(args['mileageDiff']):
-                if float(args['mileageDiff']) < 0:
-                    return {'Failure!' : 'Mileage Diff is negative!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
-                args['efficiency'] = float(args['litreTotal']) / float(args['mileageDiff'])
-                args['pricePerKm'] = float(args['payTotal']) / float(args['mileageDiff'])
+            # if this is not the first POST
+            if contentPast:
+                args['mileageDiff'] = args['mileage'] - contentPast[-1][1]
+                if float(args['mileageDiff']):
+                    if float(args['mileageDiff']) < 0:
+                        return {'Failure!' : 'Mileage Diff is negative!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
+                    args['efficiency'] = float(args['litreTotal']) / float(args['mileageDiff'])
+                    args['pricePerKm'] = float(args['payTotal']) / float(args['mileageDiff'])
+                else:
+                    return {'Failure!' : 'Mileage Diff is zero!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
+            # if this IS the first POST to car's table
             else:
-                return {'Failure!' : 'Mileage Diff is zero!', 'Mileage' : args['mileage'], 'Previous Mileage' : contentPast[-1][1]}, 500
+                args['mileageDiff'] = 0
+                args['efficiency'] = 0
+                args['pricePerKm'] = 0
             db.insertValues(carName, args)
             db.connection.close()
             return {'Success!' : carName}, 200

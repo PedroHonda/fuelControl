@@ -125,7 +125,7 @@ function addRowToAvailableTables(tName) {
     td = document.createElement("td");
     a = document.createElement("a");
     a.textContent = tName;
-    a.setAttribute("href", tName + ".html");
+    a.setAttribute("href", tName);
     td.appendChild(a);
     td.classList.add("tablesNameClass");
     tr.appendChild(td);

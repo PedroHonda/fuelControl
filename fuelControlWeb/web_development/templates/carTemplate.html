@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta http-equiv="X-UA-Compatible" content="ie=edge">
-    <title>carTemplate</title>
+    <title>{{ carName }}</title>
 </head>
 <style>
 * {
@@ -188,7 +188,11 @@ function callbackPOST (response, status) {
             postButtonVar.textContent = 'POST';
             postButtonVar.disabled = false;
         },2000);
-        httpGET("http://127.0.0.1:8080/carTemplate", insertLast);
+{% if APIipAddressPort %}
+        httpGET("http://{{ APIipAddressPort }}/{{ carName }}", insertLast);
+{% else %}
+        httpGET("http://127.0.0.1:8080/{{ carName }}", insertLast);
+{% endif %}
     } else if (status == 500) {
         postButtonVar.style.background = '#FFF';
         postButtonVar.style.color = '#FF0000';
@@ -274,10 +278,14 @@ function postValues() {
     json["date"] = inputDateVar;
     json["mileage"] = Number(inputMileageVar);
     json["pricePerLitre"] = Number(inputPricePerLitreVar);
-    json["litreTotal"] = Number(inputTotalLitre);
+    json["litreTotal"] = Number(inputTotalLitreVar);
     json["fuelType"] = inputFuelTypeVar;
     json["comments"] = inputCommentsVar;
-    httpPOST("http://127.0.0.1:8080/carTemplate", callbackPOST, json);
+{% if APIipAddressPort %}
+    httpPOST("http://{{ APIipAddressPort }}/{{ carName }}", callbackPOST, json);
+{% else %}
+    httpPOST("http://127.0.0.1:8080/{{ carName }}", callbackPOST, json);
+{% endif %}
 }
 
 function putValues() {
@@ -293,15 +301,23 @@ function putValues() {
         }
         if (isChanged) {
             putJSON["rowId"] = i+1;
-            httpPUT("http://127.0.0.1:8080/carTemplate", callbackPUT, putJSON);
+{% if APIipAddressPort %}
+            httpPUT("http://{{ APIipAddressPort }}/{{ carName }}", callbackPUT, putJSON);
+{% else %}
+            httpPUT("http://127.0.0.1:8080/{{ carName }}", callbackPUT, putJSON);
+{% endif %}
+            
         }
     }
 }
-
-httpGET("http://127.0.0.1:8080/carTemplate", fillTable);
+{% if APIipAddressPort %}
+httpGET("http://{{ APIipAddressPort }}/{{ carName }}", fillTable);
+{% else %}
+httpGET("http://127.0.0.1:8080/{{ carName }}", fillTable);
+{% endif %}
 </script>
 <body>
-    <h3>carTemplate</h3>
+    <h3>{{ carName }}</h3>
     <hr>
     <br>
     
@@ -340,6 +356,10 @@ httpGET("http://127.0.0.1:8080/carTemplate", fillTable);
     <button onclick="putValues()" id="putButton" class="buttonPUT">SUBMIT CHANGES</button>
     <br>
     <br>
-    <a href="index.html">Back</a>
+{% if OWNipAddressPort %}
+    <a href="http://{{ OWNipAddressPort }}/">Back</a>
+{% else %}
+    <a href="http://127.0.0.1:8000/">Back</a>
+{% endif %}
 </body>
 </html>
