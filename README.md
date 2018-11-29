@@ -9,3 +9,8 @@ August 28th, 2018
 ## Web development
 
 - `fuelControlWeb` : webpage to access the services above
+
+## Runnin instructions
+
+- 1. Run ```docker-compose up```
+- 2. Open your browser and access ```http://127.0.0.1:7000```
