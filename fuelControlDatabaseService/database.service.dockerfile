@@ -7,4 +7,4 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 COPY ./fuelControlDatabaseService .
 
-CMD [ "python", "/fuelControlDatabaseService/runDatabaseService.py" ]
+CMD [ "python", "runDatabaseService.py" ]
